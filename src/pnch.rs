@@ -5,7 +5,7 @@ use crate::{get_file_path, time, tag, error::GlobalError};
 ///
 /// It is represented with a beginning (in), an end (out), a tag which helps categorize the
 /// activity and a description which differentiate between each activity with a same tag.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Pnch {
     /// The date for the activity.
     pub date: time::Date,
@@ -130,18 +130,31 @@ impl From<&Pnch> for Vec<u8> {
 
 impl std::fmt::Display for Pnch {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if let Some(tag) = &self.tag {
-            write!(f, "{tag} ")?;
-        }
-        write!(f, "{} ", self.date)?;
         match self.out {
-            Some(out) => write!(f, "from {} to {out} ", self._in)?,
-            None => write!(f, "since {} ", self._in)?,
+            Some(out) => writeln!(f, "  From {} to {out} ", self._in)?,
+            None => writeln!(f, "  Since {} ", self._in)?,
         }
-        if let Some(description) = &self.description {
-            write!(f, "({description})")?;
+        match &self.tag {
+            Some(tag) => write!(f, "    {tag} ")?,
+            _ => write!(f, "    [---] ")?,
+        }
+        match &self.description {
+            Some(description) => write!(f, "{description}")?,
+            _ => write!(f, "no description")?,
         }
         Ok(())
+    }
+}
+
+impl std::cmp::Ord for Pnch {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        (&self.date, self._in).cmp(&(&other.date, other._in))
+    }
+}
+
+impl std::cmp::PartialOrd for Pnch {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        (&self.date, self._in).partial_cmp(&(&other.date, other._in))
     }
 }
 
@@ -176,12 +189,14 @@ impl Pnchs {
 
     pub fn load(tags: &tag::Tags) -> Result<Self, GlobalError> {
         let path = get_file_path(Self::PNCHS_FILE_NAME)?;
-        Ok(Self(std::fs::read(path)
+        let mut pnchs = std::fs::read(path)
             .map_err(|_| GlobalError::fs("load", "pnchs"))?
             .chunks_exact(Pnch::SIZE)
             .into_iter()
             .map(|chunk| Pnch::try_from(chunk, tags))
-            .collect::<Result<Vec<Pnch>, GlobalError>>()?))
+            .collect::<Result<Vec<Pnch>, GlobalError>>()?;
+        pnchs.sort();
+        Ok(Self(pnchs))
     }
 
     pub fn _in(&mut self, pnch: Pnch) -> Result<(), GlobalError> {
@@ -237,9 +252,20 @@ impl Pnchs {
 
 impl std::fmt::Display for Pnchs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.0.len() == 0 {
+            return writeln!(f, "No pnchs found.");
+        }
         self.0
             .iter()
-            .try_fold((), |_, pnch| writeln!(f, "{pnch}"))
+            .try_fold(time::Date::min(), |mut date, pnch| {
+                if date != pnch.date {
+                    date = pnch.date.clone();
+                    writeln!(f, "{date}")?;
+                }
+                writeln!(f, "{pnch}")?;
+                Ok(date)
+            })?;
+        Ok(())
     }
 }
 

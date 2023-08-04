@@ -1,7 +1,7 @@
 use crate::{get_file_path, error::GlobalError};
 
 /// A tag is like a category. pnchs are grouped by tags.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Tag {
     // The id of the tag.
     //

@@ -59,7 +59,7 @@ impl str::FromStr for Period {
 }
 
 /// Represent a calendar date
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub struct Date {
     year: u16,
     month: u8,
@@ -163,19 +163,7 @@ impl str::FromStr for Date {
     }
 }
 
-impl PartialOrd for Date {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let self_date = time::Date::from_calendar_date(
-            self.year.into(), self.month.try_into().ok()?, self.day)
-            .ok()?;
-        let other_date = time::Date::from_calendar_date(
-            other.year.into(), other.month.try_into().ok()?, other.day)
-            .ok()?;
-        self_date.partial_cmp(&other_date)
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Time {
     hours: u8,
     minutes: u8,
@@ -258,13 +246,5 @@ impl str::FromStr for Time {
             hours,
             minutes
         })
-    }
-}
-
-impl PartialOrd for Time {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let self_minutes: u32 = self.hours as u32 * 60 + self.minutes as u32;
-        let other_minutes: u32 = other.hours as u32 * 60 + other.minutes as u32;
-        self_minutes.partial_cmp(&other_minutes)
     }
 }

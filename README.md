@@ -59,9 +59,10 @@ You can either list in a pretty format or export in a csv format.
 ## Coming in the future
  - [ ] Prettier
     - [ ] Better error messages.
-    - [ ] Entries grouped when listing in pretty format.
+    - [x] Entries grouped when listing in pretty format.
     - [ ] Minimal colors for terminal supporting it.
 - [ ] Edit past entries
+    - [ ] Add ids to entries when printing
 - [ ] Computing the elapsed time
     - [ ] Total time
     - [ ] On specific tag
