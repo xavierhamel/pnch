@@ -1,6 +1,6 @@
 # pnch
-Track your time working on projects directly from the CLI. Categorize and add a description to what
-you did and later export your timesheet to different formats.
+Track your time from the CLI. Categorize and add a description to what you did and later export 
+your timesheet to different formats.
 
 ## Installation
 Clone the repo
@@ -29,7 +29,8 @@ pnch out "ISSUE-123/The issue was fixed"
 ```
 The tag is the value specified before the forward slash (`/`) and the description is everything
 after. In the example above, "ISSUE-123" would be the tag and "The issue was fixed" would be the
-description of the issue.
+description of the issue. The tag is something to identify a group of entries. It could be a 
+project, a subproject, a specific task, or like in this example, a particuliar issue.
 
 It is also possible to add the tag and description while punching in
 ```
@@ -56,20 +57,24 @@ pnch ls
 
 You can either list in a pretty format or export in a csv format.
 
-## Coming in the future
+## To Do
  - [ ] Prettier
     - [ ] Better error messages.
     - [x] Entries grouped when listing in pretty format.
+    - [ ] Print the entries in a table
     - [ ] Minimal colors for terminal supporting it.
 - [ ] Edit past entries
     - [ ] Add ids to entries when printing
-- [ ] Computing the elapsed time
+- [x] Computing the elapsed time
     - [x] Total time
-    - [ ] On specific tag
-    - [ ] On specific day/period
+    - [x] On specific tag
+    - [x] On specific day/period
 - [ ] Improving the install guide
 - [x] Improving the documentation (pnch help)
     - [x] Making it up to date
+- [ ] Adding configuration (pnch config)
+- [ ] Support linux
+- [ ] When the file does not exists, it should not crash
 
 ---
 Enjoy!
