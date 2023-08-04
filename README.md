@@ -64,10 +64,12 @@ You can either list in a pretty format or export in a csv format.
 - [ ] Edit past entries
     - [ ] Add ids to entries when printing
 - [ ] Computing the elapsed time
-    - [ ] Total time
+    - [x] Total time
     - [ ] On specific tag
     - [ ] On specific day/period
-- [ ] Improving the install guide and the documentation
+- [ ] Improving the install guide
+- [ ] Improving the documentation
+    - [ ] Making it up to date
 
 ---
 Enjoy!

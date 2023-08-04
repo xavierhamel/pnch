@@ -58,6 +58,38 @@ impl str::FromStr for Period {
     }
 }
 
+pub struct Duration {
+    pub minutes: i64
+}
+
+impl Duration {
+    pub fn zero() -> Self {
+        Self {
+            minutes: 0,
+        }
+    }
+}
+
+impl std::ops::Add for Duration {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self::Output {
+        Duration {
+            minutes: self.minutes + rhs.minutes
+        }
+    }
+}
+impl std::fmt::Display for Duration {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let hours = self.minutes / 60;
+        let minutes = self.minutes.abs() % 60;
+        if hours != 0 {
+            write!(f, "{hours} hours {minutes} minutes")
+        } else {
+            write!(f, "{minutes} minutes")
+        }
+    }
+}
+
 /// Represent a calendar date
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub struct Date {
@@ -246,5 +278,16 @@ impl str::FromStr for Time {
             hours,
             minutes
         })
+    }
+}
+
+impl std::ops::Sub for Time {
+    type Output = Duration;
+    fn sub(self, rhs: Self) -> Self::Output {
+        let self_minutes = self.hours as i64 * 60 + self.minutes as i64;
+        let other_minutes = rhs.hours as i64 * 60 + rhs.minutes as i64;
+        Duration {
+            minutes: self_minutes - other_minutes
+        }
     }
 }

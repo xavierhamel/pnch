@@ -104,6 +104,10 @@ impl Pnch {
             description
         })
     }
+
+    pub fn duration(&self) -> Option<time::Duration> {
+        self.out.map(|out| out - self._in)
+    }
 }
 
 impl From<&Pnch> for Vec<u8> {
@@ -131,7 +135,8 @@ impl From<&Pnch> for Vec<u8> {
 impl std::fmt::Display for Pnch {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.out {
-            Some(out) => writeln!(f, "  From {} to {out} ", self._in)?,
+            Some(out) => writeln!(f, "  From {} to {out} ({})",
+                self._in, out - self._in)?,
             None => writeln!(f, "  Since {} ", self._in)?,
         }
         match &self.tag {
@@ -255,6 +260,13 @@ impl std::fmt::Display for Pnchs {
         if self.0.len() == 0 {
             return writeln!(f, "No pnchs found.");
         }
+        let total_duration = self.0
+            .iter()
+            .filter_map(|pnch| pnch.duration())
+            .fold(time::Duration::zero(), |total, duration| {
+                total + duration
+            });
+        writeln!(f, "The total duration of pnchs was {total_duration}")?;
         self.0
             .iter()
             .try_fold(time::Date::min(), |mut date, pnch| {
