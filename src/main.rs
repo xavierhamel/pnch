@@ -58,11 +58,20 @@ pub enum Commands {
     /// One most specify it with the following format: "my_tag/The description of my task".
     /// Everything before the forward slash is a tag and everything afterwards is the description.
     /// For more information, use `pnch edit --help`.
-    /// Note that it is not possible to edit a previously closed pnch for now.
     #[command(verbatim_doc_comment)]
     Edit {
+        /// The description is used to describe the entry. While specifying the description, it is also
+        /// possible to specify a tag. For example, a description could be specify as
+        /// "ISSUE-123/The issue is fixed". The tag is the value specified before the forward slash
+        /// (`/`) and the description is everything after. In the example above, "ISSUE-123" would be
+        /// the tag and "The issue was fixed" would be the description of the issue.
         #[arg(verbatim_doc_comment)]
         description: pnch::Description,
+
+        /// Specify the id for the entry to edit. The id can be found when listing entries with
+        /// `pnch ls`
+        #[arg(long)]
+        id: Option<u32>,
     },
 
     /// List and print pnch entries. A filter can be added to only show a subset of pnchs. For
@@ -101,15 +110,14 @@ pub enum Commands {
 
 #[derive(Args, Debug)]
 pub struct Entry {
-    /// Direclty specify the tag and description of an entry without using flags. The tag and 
-    /// the description are separated with a forward slash and the tag is appearing first. When
-    /// the flags are specified, they overwrite this field extracted value.
-    /// `pnch in "my tag/my message"` is the same as `pnch in --tag "my tag" --description "my
-    /// description"`.
-    /// To only specify the tag use this format: `my tag`. To only specify the description use
-    /// this format: `/my description`.
+    /// The description is used to describe the entry. While specifying the description, it is also
+    /// possible to specify a tag. For example, a description could be specify as
+    /// "ISSUE-123/The issue is fixed". The tag is the value specified before the forward slash
+    /// (`/`) and the description is everything after. In the example above, "ISSUE-123" would be
+    /// the tag and "The issue was fixed" would be the description of the issue.
     #[arg(verbatim_doc_comment)]
     description: Option<pnch::Description>,
+
     /// Manually specify time. The format should be `hh:mm` where `hh` represent hours and
     /// `mm` represent minutes. The default value is the current local time.
     #[arg(long, verbatim_doc_comment, default_value_t)]
@@ -132,7 +140,8 @@ fn run(args: Cli) -> Result<(), GlobalError> {
             let (tag, description) = description
                 .map(|d| (d.tag.map(|t| tags.get_or_insert(t)), Some(d.description)))
                 .unwrap_or_else(|| (None, None));
-            pnchs._in(pnch::Pnch::new(time, tag, description))?;
+            let id = pnchs.0.len();
+            pnchs._in(pnch::Pnch::new(id as u32, time, tag, description))?;
             pnchs.save()?;
             tags.save()?;
             println!("You are now pnched in.");
@@ -153,9 +162,13 @@ fn run(args: Cli) -> Result<(), GlobalError> {
                 }
             }
         }
-        Commands::Edit { description } => {
-            match pnchs.get_last() {
-                Some(pnch) if pnch.out.is_some() => {
+        Commands::Edit { description, id } => {
+            let pnch = match id {
+                Some(id) => pnchs.get(id),
+                _ => pnchs.get_last(),
+            };
+            match pnch {
+                Some(pnch) if id.is_none() && pnch.out.is_some() => {
                     return Err(GlobalError::pnch_already_closed());
                 }
                 Some(pnch) => {

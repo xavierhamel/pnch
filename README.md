@@ -58,23 +58,20 @@ pnch ls
 You can either list in a pretty format or export in a csv format.
 
 ## To Do
- - [ ] Prettier
+- [x] Edit past entries
+    - [x] Add ids to entries when printing
+- [ ] When the file does not exists, it should not crash
+- [ ] Support linux
+- [ ] Adding configuration (pnch config)
+- [ ] Prettier
     - [ ] Better error messages.
     - [x] Entries grouped when listing in pretty format.
     - [ ] Print the entries in a table
     - [ ] Minimal colors for terminal supporting it.
-- [ ] Edit past entries
-    - [ ] Add ids to entries when printing
 - [x] Computing the elapsed time
-    - [x] Total time
-    - [x] On specific tag
-    - [x] On specific day/period
 - [ ] Improving the install guide
 - [x] Improving the documentation (pnch help)
     - [x] Making it up to date
-- [ ] Adding configuration (pnch config)
-- [ ] Support linux
-- [ ] When the file does not exists, it should not crash
 
 ---
 Enjoy!

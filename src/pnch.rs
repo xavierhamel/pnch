@@ -7,6 +7,8 @@ use crate::{get_file_path, time, tag, error::GlobalError};
 /// activity and a description which differentiate between each activity with a same tag.
 #[derive(Debug, PartialEq, Eq)]
 pub struct Pnch {
+    /// The id of the entry
+    pub id: u32,
     /// The date for the activity.
     pub date: time::Date,
     /// The time when the activity starts.
@@ -33,8 +35,9 @@ impl Pnch {
     /// total size of a pnch when saved in a file in bytes.
     const SIZE: usize = Self::DATE_SIZE + Self::TAG_ID_SIZE +  Self::OUT_SIZE + Self::IN_SIZE + Self::DESCRIPTION_SIZE;
 
-    pub fn new(time: time::Time, tag: Option<tag::Tag>, description: Option<String>) -> Self {
+    pub fn new(id: u32, time: time::Time, tag: Option<tag::Tag>, description: Option<String>) -> Self {
         Self {
+            id,
             _in: time,
             out: None,
             date: time::Date::today(),
@@ -67,7 +70,7 @@ impl Pnch {
         Ok(())
     }
 
-    fn try_from(chunk: &[u8], tags: &tag::Tags) -> Result<Self, GlobalError> {
+    fn try_from(id: u32, chunk: &[u8], tags: &tag::Tags) -> Result<Self, GlobalError> {
         if chunk.len() != Self::SIZE {
             return Err(GlobalError::wrong_byte_len("pnch", chunk.len(), Self::SIZE));
         }
@@ -97,6 +100,7 @@ impl Pnch {
             _ => Some(String::from_utf8(description_bytes)?),
         };
         Ok(Pnch {
+            id,
             date: date_bytes.try_into()?,
             _in: in_bytes.try_into()?,
             out,
@@ -134,10 +138,11 @@ impl From<&Pnch> for Vec<u8> {
 
 impl std::fmt::Display for Pnch {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "  #{} >", self.id)?;
         match self.out {
-            Some(out) => writeln!(f, "  From {} to {out} ({})",
+            Some(out) => writeln!(f, " From {} to {out} ({})",
                 self._in, out - self._in)?,
-            None => writeln!(f, "  Since {} ", self._in)?,
+            None => writeln!(f, " Since {} ", self._in)?,
         }
         match &self.tag {
             Some(tag) => write!(f, "    {tag} ")?,
@@ -198,7 +203,8 @@ impl Pnchs {
             .map_err(|_| GlobalError::fs("load", "pnchs"))?
             .chunks_exact(Pnch::SIZE)
             .into_iter()
-            .map(|chunk| Pnch::try_from(chunk, tags))
+            .enumerate()
+            .map(|(id, chunk)| Pnch::try_from(id as u32, chunk, tags))
             .collect::<Result<Vec<Pnch>, GlobalError>>()?;
         pnchs.sort();
         Ok(Self(pnchs))
@@ -214,6 +220,10 @@ impl Pnchs {
             }
         }
         Ok(())
+    }
+
+    pub fn get(&mut self, id: u32) -> Option<&mut Pnch> {
+        self.0.iter_mut().find(|pnch| pnch.id == id)
     }
 
     pub fn get_last(&mut self) -> Option<&mut Pnch> {
@@ -258,7 +268,10 @@ impl Pnchs {
 impl std::fmt::Display for Pnchs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.0.len() == 0 {
-            return writeln!(f, "No pnchs found.");
+            // TODO: The error should not be printed here
+            // We should also add a HINT to clarify that the filter was
+            // probably too strict.
+            return writeln!(f, "[ERROR]:\n    No pnchs found.");
         }
         let total_duration = self.0
             .iter()
@@ -272,7 +285,7 @@ impl std::fmt::Display for Pnchs {
             .try_fold(time::Date::min(), |mut date, pnch| {
                 if date != pnch.date {
                     date = pnch.date.clone();
-                    writeln!(f, "{date}")?;
+                    writeln!(f, "\n{date}")?;
                 }
                 writeln!(f, "{pnch}")?;
                 Ok(date)
