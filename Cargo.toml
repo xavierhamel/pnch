@@ -1,0 +1,11 @@
+[package]
+name = "pnch"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.3.4", features = ["derive"] }
+directories = "5.0.1"
+time = { version = "0.3.23", features = ["local-offset"] }
