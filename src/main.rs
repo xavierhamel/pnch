@@ -1,3 +1,6 @@
+///! Track your time working on projects directly from the CLI. Categorize and add a description to
+///! what you did and later export your timesheet to different formats.
+
 mod time;
 mod error;
 mod tag;
@@ -35,18 +38,33 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    /// Punch in. For more information, use `pnch in --help`.
+    /// Punch in. This starts a new entry and record the time that the command was called. A tag
+    /// and a description can be added while pnching in. It can also be added when pnching out
+    /// later on. To add a tag and description, one most specify it with the following format:
+    /// "my_tag/The description of my task". Everything before the forward slash is a tag and
+    /// everything afterwards is the description. For more information, use `pnch in --help`.
     #[command(verbatim_doc_comment)]
     In(Entry),
-    /// Punch out. For more information, use `pnch out --help`.
+
+    /// Punch out. This closes an entry that was previously opened with `pnch in`. If it was not
+    /// specified while pnching in, a tag and a description can be added. To add a tag and
+    /// description, one most specify it with the following format: "my_tag/The description of my
+    /// task". Everything before the forward slash is a tag and everything afterwards is the
+    /// description. For more information, use `pnch out --help`.
     #[command(verbatim_doc_comment)]
     Out(Entry),
+
     /// Edit or add the tag and description for a currently opened pnch. For more information, use
-    /// `pnch edit --help`.
+    /// One most specify it with the following format: "my_tag/The description of my task".
+    /// Everything before the forward slash is a tag and everything afterwards is the description.
+    /// For more information, use `pnch edit --help`.
+    /// Note that it is not possible to edit a previously closed pnch for now.
+    #[command(verbatim_doc_comment)]
     Edit {
         #[arg(verbatim_doc_comment)]
         description: pnch::Description,
     },
+
     /// List and print pnch entries. A filter can be added to only show a subset of pnchs. For
     /// example to show pnchs from the last two weeks, the command used would be 
     /// `pnch ls --last 2 weeks`. If multiple period filters (`--from`, `--to`, `--since` and

@@ -68,8 +68,8 @@ You can either list in a pretty format or export in a csv format.
     - [ ] On specific tag
     - [ ] On specific day/period
 - [ ] Improving the install guide
-- [ ] Improving the documentation
-    - [ ] Making it up to date
+- [x] Improving the documentation (pnch help)
+    - [x] Making it up to date
 
 ---
 Enjoy!
