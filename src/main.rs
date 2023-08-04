@@ -8,24 +8,42 @@ mod pnch;
 
 use clap::{Parser, Subcommand, Args};
 use error::GlobalError;
-use std::fs;
+use std::{fs, io::Read};
 
 const APP_NAME: &'static str = "pnch";
 
-/// Get a file path for a file that is in the app storage.
-pub fn get_file_path(file: &str) -> Result<String, GlobalError> {
-    let mut path = directories::BaseDirs::new()
-        .map_or(Err(GlobalError::fs("load", file)), |base_dirs| {
-            let mut path = base_dirs.data_dir().to_owned();
-            path.push(APP_NAME);
-            fs::create_dir_all(path.clone())
-                .map_err(|_| GlobalError::fs("create dir", file))?;
-            Ok(path)
-        })?;
-    path.push(file);
-    match path.to_str() {
-        Some(path) => Ok(path.to_string()),
-        _ => return Err(GlobalError::fs("load", file))
+pub mod storage {
+    use super::*;
+
+    /// Get a file path for a file that is in the app storage.
+    pub fn build_path(file: &str) -> Result<String, GlobalError> {
+        let mut path = directories::BaseDirs::new()
+            .map_or(Err(GlobalError::fs("load", file)), |base_dirs| {
+                let mut path = base_dirs.data_dir().to_owned();
+                path.push(APP_NAME);
+                fs::create_dir_all(path.clone())
+                    .map_err(|_| GlobalError::fs("create dir", file))?;
+                Ok(path)
+            })?;
+        path.push(file);
+        match path.to_str() {
+            Some(path) => Ok(path.to_string()),
+            _ => return Err(GlobalError::fs("load", file))
+        }
+    }
+
+    /// Load the content from a file a returns it.
+    pub fn load(file: &str) -> Result<Vec<u8>, GlobalError> {
+        let path = build_path(file)?;
+        let mut buffer = Vec::new();
+        std::fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .open(path)
+            .map_err(|_| GlobalError::fs("load", "pnchs"))?
+            .read_to_end(&mut buffer)
+            .map_err(|_| GlobalError::fs("load", "pnchs"))?;
+        Ok(buffer)
     }
 }
 

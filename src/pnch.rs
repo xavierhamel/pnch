@@ -1,5 +1,5 @@
 use std::{str, fmt::Write};
-use crate::{get_file_path, time, tag, error::GlobalError};
+use crate::{storage, time, tag, error::GlobalError};
 
 /// A pnch is an activity.
 ///
@@ -198,9 +198,8 @@ impl Pnchs {
     const PNCHS_FILE_NAME: &'static str = "pnchs.db";
 
     pub fn load(tags: &tag::Tags) -> Result<Self, GlobalError> {
-        let path = get_file_path(Self::PNCHS_FILE_NAME)?;
-        let mut pnchs = std::fs::read(path)
-            .map_err(|_| GlobalError::fs("load", "pnchs"))?
+        let buffer = storage::load(Self::PNCHS_FILE_NAME)?;
+        let mut pnchs = buffer
             .chunks_exact(Pnch::SIZE)
             .into_iter()
             .enumerate()
@@ -231,7 +230,7 @@ impl Pnchs {
     }
 
     pub fn save(&self) -> Result<(), GlobalError> {
-        let path = get_file_path(Self::PNCHS_FILE_NAME)?;
+        let path = storage::build_path(Self::PNCHS_FILE_NAME)?;
         let content = self.0
             .iter()
             .map(|pnch| Vec::from(pnch))

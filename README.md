@@ -60,7 +60,8 @@ You can either list in a pretty format or export in a csv format.
 ## To Do
 - [x] Edit past entries
     - [x] Add ids to entries when printing
-- [ ] When the file does not exists, it should not crash
+    - [ ] Edit past entries time
+- [x] When the file does not exists, it should not crash
 - [ ] Support linux
 - [ ] Adding configuration (pnch config)
 - [ ] Prettier

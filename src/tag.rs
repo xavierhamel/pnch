@@ -1,4 +1,4 @@
-use crate::{get_file_path, error::GlobalError};
+use crate::{storage, error::GlobalError};
 
 /// A tag is like a category. pnchs are grouped by tags.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -74,9 +74,8 @@ impl Tags {
     const TAGS_FILE_NAME: &'static str = "tags.db";
 
     pub fn load() -> Result<Self, GlobalError> {
-        let path = get_file_path(Self::TAGS_FILE_NAME)?;
-        Ok(Self(std::fs::read(path)
-            .map_err(|_| GlobalError::fs("load", "tags"))?
+        let buffer = storage::load(Self::TAGS_FILE_NAME)?;
+        Ok(Self(buffer
             .chunks_exact(Tag::SIZE)
             .into_iter()
             .map(|chunk| Tag::try_from(chunk))
@@ -102,7 +101,7 @@ impl Tags {
     }
 
     pub fn save(&self) -> Result<(), GlobalError> {
-        let path = get_file_path(Self::TAGS_FILE_NAME)?;
+        let path = storage::build_path(Self::TAGS_FILE_NAME)?;
         let content = self.0
             .iter()
             .map(|tag| Vec::from(tag))
