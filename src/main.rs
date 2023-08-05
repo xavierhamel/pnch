@@ -95,12 +95,14 @@ pub enum Commands {
     },
 
     /// List and print pnch entries. A filter can be added to only show a subset of pnchs. For
-    /// example to show pnchs from the last two weeks, the command used would be 
+    /// example to show pnchs from the last two weeks, the command used would be
     /// `pnch ls --last 2 weeks`. If multiple period filters (`--from`, `--to`, `--since` and
     /// `--last`) are used, they act as unions and all pnchs that match at least one filter will be
     /// returned. The `--tag` filter will take this list and only returns pnchs that match the
     /// specified tag. It is also possible to format the output as a pretty print or in a csv
-    /// format. For more information, use `pnch ls --help`.
+    /// format. By default, only the entries from the last 14 days are listed. To change this
+    /// value, use `pnch config ls-default-period "28 days"`. For more information, use `pnch ls
+    /// --help`.
     #[command(verbatim_doc_comment)]
     Ls {
         /// Get all pnchs since the specified date in the yyyy-mm-dd format
