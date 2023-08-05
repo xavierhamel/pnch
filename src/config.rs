@@ -67,7 +67,7 @@ impl default::Default for Config {
     fn default() -> Self {
         Self {
             print_color: true,
-            ls_default_period: time::Period::Days(14),
+            ls_default_period: time::Period::Weeks(2),
         }
     }
 }

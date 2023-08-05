@@ -67,12 +67,14 @@ You can either list in a pretty format or export in a csv format.
 - [x] When the file does not exists, it should not crash
 - [x] Support linux
 - [x] Adding configuration (pnch config)
+    - [ ] Adding default print format
+    - [ ] Updating the name of ls-default-period
 - [ ] Prettier
     - [ ] Better error messages.
         - [ ] Use a similar format to clap's errors.
     - [x] Entries grouped when listing in pretty format.
     - [x] Print the entries in a table
-        - [ ] Add a time total in the table
+        - [x] Add a time total in the table
     - [ ] Minimal colors for terminal supporting it.
 - [x] Computing the elapsed time
 - [ ] Add AM and PM support

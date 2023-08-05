@@ -264,7 +264,16 @@ impl Pnchs {
     }
 
     pub fn into_table(self) -> PnchsTable {
-        PnchsTable(self.0)
+        PnchsTable(self)
+    }
+
+    pub fn duration(&self) -> time::Duration {
+        self.0
+            .iter()
+            .filter_map(|pnch| pnch.duration())
+            .fold(time::Duration::zero(), |total, duration| {
+                total + duration
+            })
     }
 }
 
@@ -276,12 +285,7 @@ impl std::fmt::Display for Pnchs {
             // probably too strict.
             return writeln!(f, "[ERROR]:\n    No pnchs found.");
         }
-        let total_duration = self.0
-            .iter()
-            .filter_map(|pnch| pnch.duration())
-            .fold(time::Duration::zero(), |total, duration| {
-                total + duration
-            });
+        let total_duration = self.duration();
         writeln!(f, "The total duration of pnchs was {total_duration}")?;
         self.0
             .iter()
@@ -316,7 +320,7 @@ impl str::FromStr for Format {
     }
 }
 
-pub struct PnchsTable(Vec<Pnch>);
+pub struct PnchsTable(Pnchs);
 
 impl PnchsTable {
     const COLS: usize = 6;
@@ -388,7 +392,7 @@ impl std::fmt::Display for PnchsTable {
         ];
 
         let mut date = time::Date::min();
-        for pnch in self.0.iter() {
+        for pnch in self.0.0.iter() {
             let (did_date_update, cells) = self.pnch_to_cells(pnch, &mut date);
             if did_date_update {
                 rows.push(separator.clone());
@@ -397,6 +401,8 @@ impl std::fmt::Display for PnchsTable {
         }
         rows.push(self.separator("└", "┴", "┘"));
         let table = rows.join("\n");
+        let total_duration = self.0.duration();
+        writeln!(f, "The total duration of pnchs was {total_duration}")?;
         writeln!(f, "{table}")
     }
 }
