@@ -62,8 +62,8 @@ You can either list in a pretty format or export in a csv format.
     - [x] Add ids to entries when printing
     - [ ] Edit past entries time
 - [x] When the file does not exists, it should not crash
-- [ ] Support linux
-- [ ] Adding configuration (pnch config)
+- [x] Support linux
+- [x] Adding configuration (pnch config)
 - [ ] Prettier
     - [ ] Better error messages.
     - [x] Entries grouped when listing in pretty format.

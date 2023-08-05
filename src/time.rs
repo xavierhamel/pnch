@@ -39,6 +39,15 @@ impl Period {
             None => Date::min()
         }
     }
+
+    pub fn as_days(&self) -> u32 {
+        match self {
+            Self::Days(count) => *count,
+            Self::Weeks(count) => *count * 7,
+            Self::Months(count) => *count * 30,
+            Self::Years(count) => *count * 365,
+        }
+    }
 }
 
 impl str::FromStr for Period {
@@ -57,6 +66,7 @@ impl str::FromStr for Period {
         }
     }
 }
+
 
 pub struct Duration {
     pub minutes: i64

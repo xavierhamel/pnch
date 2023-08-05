@@ -112,6 +112,13 @@ impl GlobalError {
             hint: Some(String::from("Before pnching in, close the pnch with `pnch out`"))
         }
     }
+
+    pub fn config_invalid_key(key: &str) -> Self {
+        Self {
+            error: format!("`{key}` is not a valid configuration key"),
+            hint: Some(String::from("Valid keys are `print-color` and `ls-default-period`"))
+        }
+    }
 }
 
 impl From<std::string::FromUtf8Error> for GlobalError {

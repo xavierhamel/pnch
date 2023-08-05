@@ -1,6 +1,7 @@
 ///! Track your time working on projects directly from the CLI. Categorize and add a description to
 ///! what you did and later export your timesheet to different formats.
 
+mod config;
 mod time;
 mod error;
 mod tag;
@@ -39,10 +40,11 @@ pub mod storage {
         std::fs::OpenOptions::new()
             .write(true)
             .create(true)
+            .read(true)
             .open(path)
-            .map_err(|_| GlobalError::fs("load", "pnchs"))?
+            .map_err(|_| GlobalError::fs("load", file))?
             .read_to_end(&mut buffer)
-            .map_err(|_| GlobalError::fs("load", "pnchs"))?;
+            .map_err(|_| GlobalError::fs("load", file))?;
         Ok(buffer)
     }
 }
@@ -124,6 +126,10 @@ pub enum Commands {
         #[arg(long)]
         format: Option<pnch::Format>
     },
+    Config {
+        key: String,
+        value: String,
+    }
 }
 
 #[derive(Args, Debug)]
@@ -152,6 +158,7 @@ fn main() {
 fn run(args: Cli) -> Result<(), GlobalError> {
     let mut tags = tag::Tags::load()?;
     let mut pnchs = pnch::Pnchs::load(&tags)?;
+    let mut config = config::Config::load()?;
 
     match args.command {
         Commands::In(Entry { description, time }) => {
@@ -209,8 +216,8 @@ fn run(args: Cli) -> Result<(), GlobalError> {
             }
             let since = since.unwrap_or(time::Date::min());
             let last_as_since = last
-                .map(|l| l.to_date_since_today())
-                .unwrap_or(time::Date::min());
+                .unwrap_or(config.ls_default_period)
+                .to_date_since_today();
             let from = from.unwrap_or(time::Date::min());
             let to = to.unwrap_or(time::Date::max());
             let pnchs = pnch::Pnchs(pnchs
@@ -242,6 +249,11 @@ fn run(args: Cli) -> Result<(), GlobalError> {
                 Some(pnch::Format::Csv) => println!("{}", pnchs.into_csv()?),
                 _ => println!("{pnchs}")
             }
+        }
+        Commands::Config { key, value } => {
+            config.try_set(&key, &value)?;
+            config.save()?;
+            println!("The config was updated.");
         }
     }
     Ok(())
