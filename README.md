@@ -47,8 +47,6 @@ or could be edited later:
 pnch edit "ISSUE-124/The source of the bug was NOT found"
 ```
 
-For now, when an entry is closed (with `pnch out`) there is no way to edit it afterwards.
-
 If you forgot to pnch in, it is also possible to specify the time while punching in or out:
 ```
 pnch in --time 8:02
@@ -82,8 +80,8 @@ You can either list in a pretty format or export in a csv format.
     - [ ] In the config while printing
 - [ ] Improving the install guide
 - [ ] Add billable/non billable hours
-- [x] Improving the documentation (pnch help)
-    - [x] Making it up to date
+- [ ] Improving the documentation (pnch help)
+    - [ ] Making it up to date
 
 ---
 Enjoy!
