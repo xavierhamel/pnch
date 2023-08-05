@@ -1,4 +1,7 @@
 # pnch
+**pnch is still in active development. Breaking change could happen at any moment. An older version
+may not be compatible with a newer one.**
+
 Track your time from the CLI. Categorize and add a description to what you did and later export 
 your timesheet to different formats.
 
@@ -62,17 +65,23 @@ You can either list in a pretty format or export in a csv format.
 ## To Do
 - [x] Edit past entries
     - [x] Add ids to entries when printing
-    - [ ] Edit past entries time
+    - [x] Edit past entries time
 - [x] When the file does not exists, it should not crash
 - [x] Support linux
 - [x] Adding configuration (pnch config)
 - [ ] Prettier
     - [ ] Better error messages.
+        - [ ] Use a similar format to clap's errors.
     - [x] Entries grouped when listing in pretty format.
     - [x] Print the entries in a table
+        - [ ] Add a time total in the table
     - [ ] Minimal colors for terminal supporting it.
 - [x] Computing the elapsed time
+- [ ] Add AM and PM support
+    - [ ] For the parser
+    - [ ] In the config while printing
 - [ ] Improving the install guide
+- [ ] Add billable/non billable hours
 - [x] Improving the documentation (pnch help)
     - [x] Making it up to date
 

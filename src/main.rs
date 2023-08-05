@@ -86,12 +86,25 @@ pub enum Commands {
         /// (`/`) and the description is everything after. In the example above, "ISSUE-123" would be
         /// the tag and "The issue was fixed" would be the description of the issue.
         #[arg(verbatim_doc_comment)]
-        description: pnch::Description,
+        description: Option<pnch::Description>,
 
         /// Specify the id for the entry to edit. The id can be found when listing entries with
         /// `pnch ls`
         #[arg(long)]
         id: Option<u32>,
+
+        /// Specify the new start time of the entry to edit. The format should be `hh:mm` where
+        /// `hh` represent hours and `mm` represent minutes. The default value is the current local
+        /// time.
+        #[arg(long)]
+        r#in: Option<time::Time>,
+
+        /// Specify the new start time of the entry to edit. The format should be `hh:mm` where
+        /// `hh` represent hours and `mm` represent minutes. The default value is the current local
+        /// time. This option is only valid when `--id` is specified (When it is not specified,
+        /// simply use `pnch out --time ...`).
+        #[arg(long)]
+        out: Option<time::Time>,
     },
 
     /// List and print pnch entries. A filter can be added to only show a subset of pnchs. For
@@ -189,19 +202,24 @@ fn run(args: Cli) -> Result<(), GlobalError> {
                 }
             }
         }
-        Commands::Edit { description, id } => {
+        Commands::Edit { description, id, r#in, out } => {
             let pnch = match id {
                 Some(id) => pnchs.get(id),
                 _ => pnchs.get_last(),
             };
             match pnch {
-                Some(pnch) if id.is_none() && pnch.out.is_some() => {
-                    return Err(GlobalError::pnch_already_closed());
-                }
                 Some(pnch) => {
-                    let tag = description.tag.map(|t| tags.get_or_insert(t));
-                    pnch.tag = tag;
-                    pnch.description = Some(description.description);
+                    if let Some(out) = out {
+                        pnch.out = Some(out);
+                    }
+                    if let Some(_in) = r#in {
+                        pnch._in = _in;
+                    }
+                    if let Some(description) = description {
+                        let tag = description.tag.map(|t| tags.get_or_insert(t));
+                        pnch.tag = tag;
+                        pnch.description = Some(description.description);
+                    }
                     pnchs.save()?;
                     tags.save()?;
                     println!("The pnch was edited.");
@@ -210,7 +228,6 @@ fn run(args: Cli) -> Result<(), GlobalError> {
                     return Err(GlobalError::pnch_not_open());
                 }
             }
-
         }
         Commands::Ls { since, last, from, to, tag, format } => {
             if from.is_some() && to.is_none() || from.is_none() && to.is_some() {
