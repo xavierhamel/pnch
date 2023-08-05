@@ -249,7 +249,8 @@ fn run(args: Cli) -> Result<(), GlobalError> {
 
             match format {
                 Some(pnch::Format::Csv) => println!("{}", pnchs.into_csv()?),
-                _ => println!("{pnchs}")
+                Some(pnch::Format::List) => println!("{pnchs}"),
+                _ => println!("{}", pnchs.into_table())
             }
         }
         Commands::Config { key, value } => {

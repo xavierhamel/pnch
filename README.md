@@ -2,6 +2,8 @@
 Track your time from the CLI. Categorize and add a description to what you did and later export 
 your timesheet to different formats.
 
+If it doesn't do something which you feel it should or it's not clear how to, please file an issue.
+
 ## Installation
 Clone the repo
 ```
@@ -67,7 +69,7 @@ You can either list in a pretty format or export in a csv format.
 - [ ] Prettier
     - [ ] Better error messages.
     - [x] Entries grouped when listing in pretty format.
-    - [ ] Print the entries in a table
+    - [x] Print the entries in a table
     - [ ] Minimal colors for terminal supporting it.
 - [x] Computing the elapsed time
 - [ ] Improving the install guide

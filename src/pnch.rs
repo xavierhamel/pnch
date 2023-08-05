@@ -262,6 +262,10 @@ impl Pnchs {
             .collect::<Result<String, std::fmt::Error>>()
             .map_err(|_| GlobalError::formatting("csv"))
     }
+
+    pub fn into_table(self) -> PnchsTable {
+        PnchsTable(self.0)
+    }
 }
 
 impl std::fmt::Display for Pnchs {
@@ -295,7 +299,8 @@ impl std::fmt::Display for Pnchs {
 
 #[derive(Debug, Clone)]
 pub enum Format {
-    Pretty,
+    Table,
+    List,
     Csv
 }
 
@@ -303,9 +308,95 @@ impl str::FromStr for Format {
     type Err = GlobalError;
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match &value.to_lowercase()[..] {
-            "pretty" => Ok(Self::Pretty),
+            "table" => Ok(Self::Table),
+            "list" => Ok(Self::List),
             "csv" => Ok(Self::Csv),
             _ => Err(GlobalError::parse("export format", value.to_string(), "`pretty` or `csv`"))
         }
+    }
+}
+
+pub struct PnchsTable(Vec<Pnch>);
+
+impl PnchsTable {
+    const COLS: usize = 6;
+    const COLS_WIDTH: [usize; Self::COLS] = [12, 7, 16, 7, 7, 44];
+
+    fn pnch_to_cells(&self, pnch: &Pnch, date: &mut time::Date) -> (bool, Vec<String>) {
+        let mut cells = Vec::new();
+        let did_date_update = if pnch.date != *date {
+            *date = pnch.date.clone();
+            cells.push(format!("{date}"));
+            true
+        } else {
+            cells.push(String::new());
+            false
+        };
+        cells.push(pnch.id.to_string());
+        cells.push(pnch.tag.as_ref().map(|t| t.to_string()).unwrap_or(String::from("---")));
+        cells.push(pnch._in.to_string());
+        cells.push(pnch.out.as_ref().map(|o| o.to_string()).unwrap_or(String::new()));
+        cells.push(pnch.description.clone().unwrap_or(String::new()));
+        (did_date_update, cells)
+    }
+
+    fn cells_to_string(&self, cells: Vec<String>) -> String {
+        let mut cells = cells
+            .iter()
+            .enumerate()
+            .map(|(idx, cell)| {
+                format!("│ {:<width$} ", cell, width = Self::COLS_WIDTH[idx] - 2)
+            })
+            .collect::<String>();
+        cells.push_str("│");
+        cells
+    }
+
+    fn separator(&self, left: &str, mid: &str, right: &str) -> String {
+        let mut separator = String::from(left);
+        separator.push_str(&Self::COLS_WIDTH.iter().enumerate().map(|(idx, width)| {
+            let mut end = mid;
+            if idx == Self::COLS_WIDTH.len() - 1 {
+                end = right
+            }
+            format!("{}{end}", &"-".repeat(*width))
+        }).collect::<String>());
+        separator
+    }
+}
+
+//┌────────────┬───────┬────────────────┬───────┬───────┬────────────────────────────────────┐
+//│ Date       │ Id    │ Tag            │ In    │ Out   │ Description                        │
+//├────────────┼───────┼────────────────┼───────┼───────┼────────────────────────────────────┤
+//│ 2023-05-10 │  9:23 │ RDG-123        │  9:23 │ 10:33 │ Ceci est ma description            │
+//│            │  9:23 │ RDG-123        │  9:23 │ 10:33 │ Ceci est ma description            │
+//│            │  9:23 │ RDG-123-123-2..│  9:23 │ 10:33 │ Ceci est ma description            │
+//├────────────┼───────┼────────────────┼───────┼───────┼────────────────────────────────────┤
+//│ 2023-05-11 │  9:23 │ RDG-123        │  9:23 │ 10:33 │ Ceci est ma description            │
+//│            │  9:23 │ RDG-123        │  9:23 │ 10:33 │ Ceci est ma description            │
+//│            │  9:23 │ RDG-123        │  9:23 │ 10:33 │ Ceci est ma description            │
+//└────────────┴───────┴────────────────┴───────┴───────┴────────────────────────────────────┘
+impl std::fmt::Display for PnchsTable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let separator = self.separator("├", "┼", "┤");
+        let mut rows = vec![
+            self.separator("┌", "┬", "┐"),
+            self.cells_to_string(vec![
+                String::from("Date"), String::from("Id"), String::from("Tag"),
+                String::from("In"), String::from("Out"), String::from("Description"),
+            ])
+        ];
+
+        let mut date = time::Date::min();
+        for pnch in self.0.iter() {
+            let (did_date_update, cells) = self.pnch_to_cells(pnch, &mut date);
+            if did_date_update {
+                rows.push(separator.clone());
+            }
+            rows.push(self.cells_to_string(cells));
+        }
+        rows.push(self.separator("└", "┴", "┘"));
+        let table = rows.join("\n");
+        writeln!(f, "{table}")
     }
 }
