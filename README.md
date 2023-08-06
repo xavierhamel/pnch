@@ -1,10 +1,29 @@
 # pnch
-Track your time from the CLI. Categorize and add a description to what you did and later export 
-your timesheet to different formats.
+Track your time from the CLI. 
+
+<img src="./assets/logo.png" width="250" alt="pnch" align="right">
+
+- [Overview](#overview)
+- [Installation](#installation)
+- [How to use it](#how-to-use-it)
+    - [Managing entries](#managing-entries)
+    - [Listing and exporting entries](#listing-and-exporting-entries)
+- [Integrations](#integrations)
+    - [Tempo](#tempo)
+- [License](#license)
+
+## Overview
+Categorize and add a description to what you did and later export your timesheet to different formats.
 
 If it doesn't do something which you feel it should or it's not clear how to, please file an issue.
 
 ```
+$ pnch in
+you are now pnched in.
+
+$ pnch out "pnch/Release on github!"
+you are now pnched out.
+
 $ pnch ls
 You were punched in for 8 hours 22 minutes
 ┌------------┬-------┬----------------┬-------┬-------┬--------------------------------------------┐
@@ -20,14 +39,6 @@ You were punched in for 8 hours 22 minutes
 │ 2023-08-06 │ 9     │ [pnch]         │ 10:03 │ 10:33 │ Release on github!                         │
 └------------┴-------┴----------------┴-------┴-------┴--------------------------------------------┘
 ```
-
-- [Installation](#installation)
-- [How to use it](#how-to-use-it)
-    - [Managing entries](#managing-entries)
-    - [Listing and exporting entries](#listing-and-exporting-entries)
-- [Integrations](#integrations)
-    - [Tempo](#tempo)
-- [License](#license)
 
 ## Installation
 Clone the repo
