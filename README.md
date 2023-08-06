@@ -23,6 +23,11 @@ You were punched in for 8 hours 22 minutes
 
 - [Installation](#installation)
 - [How to use it](#how-to-use-it)
+    - [Managing entries](#managing-entries)
+    - [Listing and exporting entries](#listing-and-exporting-entries)
+- [Integrations](#integrations)
+    - [Tempo](#tempo)
+- [License](#license)
 
 ## Installation
 Clone the repo
@@ -97,5 +102,9 @@ pnch ls --tag "ISSUE-123"
 
 You can either list in a pretty format or export in a csv format.
 
----
+## Integrations
+### Tempo
+Coming soon
+
+## License
 MIT - Enjoy!
