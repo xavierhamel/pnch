@@ -55,7 +55,7 @@ impl Config {
             }
             "print-color" => {
                 self.print_color = bool::from_str(value)
-                    .map_err(|_| GlobalError::parse("bool", value.to_string(), "one of `true` or `false`"))?;
+                    .map_err(|_| GlobalError::parse("one of `true` or `false`"))?;
                 Ok(())
             }
             _ => Err(GlobalError::config_invalid_key(key))

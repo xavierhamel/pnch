@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.3.4", features = ["derive"] }
+colored = "2.0.4"
 directories = "5.0.1"
 time = { version = "0.3.23", features = ["local-offset"] }

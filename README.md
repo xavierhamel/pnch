@@ -66,22 +66,21 @@ You can either list in a pretty format or export in a csv format.
     - [x] Edit past entries time
 - [x] When the file does not exists, it should not crash
 - [x] Support linux
+- [x] Add AM and PM support
+    - [x] For the parser
+    - [ ] In the config while printing
 - [x] Adding configuration (pnch config)
     - [ ] Adding default print format
     - [ ] Updating the name of ls-default-period
-- [ ] Prettier
-    - [ ] Better error messages.
-        - [ ] Use a similar format to clap's errors.
+- [x] Prettier
+    - [x] Better error messages.
+        - [x] Use a similar format to clap's errors.
     - [x] Entries grouped when listing in pretty format.
     - [x] Print the entries in a table
         - [x] Add a time total in the table
-    - [ ] Minimal colors for terminal supporting it.
+    - [x] Minimal colors for terminal supporting it.
 - [x] Computing the elapsed time
-- [ ] Add AM and PM support
-    - [ ] For the parser
-    - [ ] In the config while printing
 - [ ] Improving the install guide
-- [ ] Add billable/non billable hours
 - [ ] Improving the documentation (pnch help)
     - [ ] Making it up to date
 

@@ -315,7 +315,7 @@ impl str::FromStr for Format {
             "table" => Ok(Self::Table),
             "list" => Ok(Self::List),
             "csv" => Ok(Self::Csv),
-            _ => Err(GlobalError::parse("export format", value.to_string(), "`pretty` or `csv`"))
+            _ => Err(GlobalError::parse("`pretty` or `csv`"))
         }
     }
 }

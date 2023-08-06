@@ -56,13 +56,13 @@ impl str::FromStr for Period {
         let (count_str, period_str) = value.split_once(" ").unwrap_or(("1", value));
         let count = count_str
             .parse()
-            .map_err(|_| GlobalError::parse("period", value.to_string(), Self::FORMAT_HINT))?;
+            .map_err(|_| GlobalError::parse(Self::FORMAT_HINT))?;
         match period_str {
             "days" | "day" => Ok(Self::Days(count)),
             "weeks" | "week" => Ok(Self::Weeks(count)),
             "months" | "month" => Ok(Self::Months(count)),
             "years" | "year" => Ok(Self::Years(count)),
-            _ => Err(GlobalError::parse("period", value.to_string(), Self::FORMAT_HINT))
+            _ => Err(GlobalError::parse(Self::FORMAT_HINT))
         }
     }
 }
@@ -191,7 +191,7 @@ impl std::fmt::Display for Date {
 impl str::FromStr for Date {
     type Err = GlobalError;
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        let error = GlobalError::parse("date", value.to_string(), Self::FORMAT_HINT);
+        let error = GlobalError::parse( Self::FORMAT_HINT);
         let (year_str, month_and_day_str) = value.split_once("-")
             .ok_or_else(|| error.clone())?;
         let (month_str, day_str) = month_and_day_str.split_once("-")
@@ -278,12 +278,24 @@ impl str::FromStr for Time {
     type Err = error::GlobalError;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        let (hours_str, minutes_str) = value.split_once(":")
-            .ok_or_else(|| GlobalError::parse("time", value.to_string(), Time::FORMAT_HINT))?;
-        let hours = hours_str.parse::<u8>()
-            .map_err(|_| GlobalError::parse("time", value.to_string(), Time::FORMAT_HINT))?;
+        if value.len() < 5 {
+            return Err(GlobalError::parse(Time::FORMAT_HINT));
+        }
+        let mut offset = 0;
+        if value.to_lowercase().ends_with("pm") {
+            offset = 12;
+        }
+        let (striped, other) = value.split_at(5);
+        dbg!(striped.clone(), other);
+        let (hours_str, minutes_str) = striped.split_once(":")
+            .ok_or_else(|| GlobalError::parse(Time::FORMAT_HINT))?;
+        let mut hours = offset + hours_str.parse::<u8>()
+            .map_err(|_| GlobalError::parse(Time::FORMAT_HINT))?;
+        if hours > 23 {
+            hours -= 12;
+        }
         let minutes = minutes_str.parse::<u8>()
-            .map_err(|_| GlobalError::parse("time", value.to_string(), Time::FORMAT_HINT))?;
+            .map_err(|_| GlobalError::parse(Time::FORMAT_HINT))?;
         Ok(Self {
             hours,
             minutes
