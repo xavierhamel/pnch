@@ -285,8 +285,7 @@ impl str::FromStr for Time {
         if value.to_lowercase().ends_with("pm") {
             offset = 12;
         }
-        let (striped, other) = value.split_at(5);
-        dbg!(striped.clone(), other);
+        let (striped, _) = value.split_at(5);
         let (hours_str, minutes_str) = striped.split_once(":")
             .ok_or_else(|| GlobalError::parse(Time::FORMAT_HINT))?;
         let mut hours = offset + hours_str.parse::<u8>()
