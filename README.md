@@ -1,11 +1,28 @@
 # pnch
-**pnch is still in active development. Breaking change could happen at any moment. An older version
-may not be compatible with a newer one.**
-
 Track your time from the CLI. Categorize and add a description to what you did and later export 
 your timesheet to different formats.
 
 If it doesn't do something which you feel it should or it's not clear how to, please file an issue.
+
+```
+$ pnch ls
+You were punched in for 8 hours 22 minutes
+┌------------┬-------┬----------------┬-------┬-------┬--------------------------------------------┐
+│ Date       │ Id    │ Tag            │ In    │ Out   │ Description                                │
+├------------┼-------┼----------------┼-------┼-------┼--------------------------------------------┤
+│ 2023-07-30 │ 4     │ [pnch]         │ 18:31 │ 20:29 │ Added tags                                 │
+├------------┼-------┼----------------┼-------┼-------┼--------------------------------------------┤
+│ 2023-08-04 │ 5     │ [pnch]         │ 08:30 │ 09:41 │ Added description                          │
+│            │ 6     │ [pnch]         │ 09:41 │ 11:03 │ Better error messages                      │
+│            │ 7     │ [pnch]         │ 11:03 │ 12:08 │ Resolve a bug                              │
+│            │ 8     │ [pnch]         │ 12:59 │ 14:15 │ Added editing                              │
+├------------┼-------┼----------------┼-------┼-------┼--------------------------------------------┤
+│ 2023-08-06 │ 9     │ [pnch]         │ 10:03 │ 10:33 │ Release on github!                         │
+└------------┴-------┴----------------┴-------┴-------┴--------------------------------------------┘
+```
+
+- [Installation](#installation)
+- [How to use it](#how-to-use-it)
 
 ## Installation
 Clone the repo
@@ -19,7 +36,7 @@ cd pnch
 cargo build --release
 ```
 
-Finally, add the built binary to your paths!
+Finally, add the built binary to your paths.
 
 ## How to use it
 ### Managing entries
@@ -52,37 +69,33 @@ If you forgot to pnch in, it is also possible to specify the time while punching
 pnch in --time 8:02
 ```
 
+or by editing it later on:
+```
+pnch edit --in 8:01
+```
+
 ### Listing and exporting entries
 To export or list your timesheet, use the command
 ```
 pnch ls
 ```
+By default, only the last two weeks are printed. To print more use the different period filters:
+```
+pnch ls --since 2023-01-01 --from 2022-12-01 --to 2022-12-05 --last "4 weeks"
+```
+> Note that an entry only needs to be true for only one flag to be returned by the `ls` commands.
+
+To update the default period, use
+```
+pnch config ls-default-period "5 weeks"
+```
+
+You can also filter by tags
+```
+pnch ls --tag "ISSUE-123"
+```
 
 You can either list in a pretty format or export in a csv format.
 
-## To Do
-- [x] Edit past entries
-    - [x] Add ids to entries when printing
-    - [x] Edit past entries time
-- [x] When the file does not exists, it should not crash
-- [x] Support linux
-- [x] Add AM and PM support
-    - [x] For the parser
-    - [ ] In the config while printing
-- [x] Adding configuration (pnch config)
-    - [ ] Adding default print format
-    - [ ] Updating the name of ls-default-period
-- [x] Prettier
-    - [x] Better error messages.
-        - [x] Use a similar format to clap's errors.
-    - [x] Entries grouped when listing in pretty format.
-    - [x] Print the entries in a table
-        - [x] Add a time total in the table
-    - [x] Minimal colors for terminal supporting it.
-- [x] Computing the elapsed time
-- [ ] Improving the install guide
-- [ ] Improving the documentation (pnch help)
-    - [ ] Making it up to date
-
 ---
-Enjoy!
+MIT - Enjoy!

@@ -1,5 +1,6 @@
 use std::{str, fmt::Write};
 use crate::{storage, time, tag, error::GlobalError};
+use colored::*;
 
 /// A pnch is an activity.
 ///
@@ -283,10 +284,10 @@ impl std::fmt::Display for Pnchs {
             // TODO: The error should not be printed here
             // We should also add a HINT to clarify that the filter was
             // probably too strict.
-            return writeln!(f, "[ERROR]:\n    No pnchs found.");
+            return writeln!(f, "{}\n    No pnchs were found.", "error:".red());
         }
         let total_duration = self.duration();
-        writeln!(f, "The total duration of pnchs was {total_duration}")?;
+        writeln!(f, "You were punched in for {total_duration}")?;
         self.0
             .iter()
             .try_fold(time::Date::min(), |mut date, pnch| {
@@ -382,6 +383,12 @@ impl PnchsTable {
 //└────────────┴───────┴────────────────┴───────┴───────┴────────────────────────────────────┘
 impl std::fmt::Display for PnchsTable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.0.0.len() == 0 {
+            // TODO: The error should not be printed here
+            // We should also add a HINT to clarify that the filter was
+            // probably too strict.
+            return writeln!(f, "{}\n    No pnchs were found.", "error:".red());
+        }
         let separator = self.separator("├", "┼", "┤");
         let mut rows = vec![
             self.separator("┌", "┬", "┐"),
@@ -402,7 +409,7 @@ impl std::fmt::Display for PnchsTable {
         rows.push(self.separator("└", "┴", "┘"));
         let table = rows.join("\n");
         let total_duration = self.0.duration();
-        writeln!(f, "The total duration of pnchs was {total_duration}")?;
+        writeln!(f, "You were punched in for {total_duration}")?;
         writeln!(f, "{table}")
     }
 }
