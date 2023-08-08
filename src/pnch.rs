@@ -338,7 +338,7 @@ impl PnchsTable {
             false
         };
         cells.push(pnch.id.to_string());
-        cells.push(pnch.tag.as_ref().map(|t| t.to_string()).unwrap_or(String::from("---")));
+        cells.push(pnch.tag.as_ref().map(|t| t.tag.to_string()).unwrap_or(String::from("---")));
         cells.push(pnch._in.to_string());
         cells.push(pnch.out.as_ref().map(|o| o.to_string()).unwrap_or(String::new()));
         cells.push(pnch.description.clone().unwrap_or(String::new()));

@@ -278,14 +278,18 @@ impl str::FromStr for Time {
     type Err = error::GlobalError;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        if value.len() < 5 {
+        if value.len() < 4 {
             return Err(GlobalError::parse(Time::FORMAT_HINT));
         }
         let mut offset = 0;
         if value.to_lowercase().ends_with("pm") {
             offset = 12;
         }
-        let (striped, _) = value.split_at(5);
+        let striped = if value.len() <= 4 {
+            value
+        } else {
+            value.split_at(5).0
+        };
         let (hours_str, minutes_str) = striped.split_once(":")
             .ok_or_else(|| GlobalError::parse(Time::FORMAT_HINT))?;
         let mut hours = offset + hours_str.parse::<u8>()
